@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="7dp"
+    android:paddingTop="10dp"
+    android:clipToPadding="false"
+    android:background="?selectableItemBackgroundBorderless"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:id="@+id/tab_item_layout_icon"
+        android:layout_width="@dimen/nav_item_icon_width"
+        android:layout_height="@dimen/nav_item_icon_width"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitXY"/>
+
+    <TextView
+        android:id="@+id/tab_item_layout_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/nav_item_label_text_size"
+        android:layout_below="@id/tab_item_layout_icon"
+        android:layout_centerHorizontal="true"/>
+
+    <com.caij.badge.BadgeTextView
+        android:id="@+id/tv_badge"
+        style="@style/BadgeText"
+        android:layout_toRightOf="@id/tab_item_layout_icon"
+        android:visibility="gone"
+        android:layout_marginLeft="-6dp"
+        android:layout_marginTop="-3dp"
+        android:layout_alignTop="@id/tab_item_layout_icon"/>
+
+</RelativeLayout>
