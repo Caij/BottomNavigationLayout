@@ -2,9 +2,24 @@
 
 ![image](image/device-2017-01-16-111430.png)
 
+Download
+--------
+Or use Gradle:
+
+```gradle
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+dependencies {
+    compile 'com.github.Caij:BottomNavigationLayout:v1.0.0'
+}
+```
+
 ###Thanks
 com.ashokvarma.android:bottom-navigation-bar
-
 
 
 ###License
