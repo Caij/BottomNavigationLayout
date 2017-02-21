@@ -147,9 +147,9 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
     public void onRestoreInstanceState(CoordinatorLayout parent, BottomNavigationLayout child, Parcelable state) {
         super.onRestoreInstanceState(parent, child, state);
         if (state instanceof SavedState) {
-            SavedState savedState = new SavedState(state);
-            Log.d("onRestoreInstanceState", savedState.isHidden + "   ");
-            if (savedState.isHidden) {
+            SavedState ss = (SavedState) state;
+            Log.d("onRestoreInstanceState", ss.isHidden + "   ");
+            if (ss.isHidden) {
                 child.hide(false);
             }else {
                 child.show(false);
