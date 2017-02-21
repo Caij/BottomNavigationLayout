@@ -3,7 +3,6 @@ package com.caij.nav.behaviour;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.os.ParcelableCompat;
@@ -18,7 +17,6 @@ import android.view.animation.Interpolator;
 
 import com.caij.nav.BottomNavigationLayout;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
@@ -31,6 +29,7 @@ import java.util.List;
  */
 public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<BottomNavigationLayout> {
     private static final Interpolator INTERPOLATOR = new FastOutSlowInInterpolator();
+    private static final String TAG = "BottomBehavior";
     private Boolean bottomNavigationLayoutIsHidden;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -41,10 +40,12 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         // First let the parent lay it out
         parent.onLayoutChild(child, layoutDirection);
 
-        if (bottomNavigationLayoutIsHidden != null && bottomNavigationLayoutIsHidden && !child.isHidden()) {
-            child.hide(false);
-        }else if (child.isHidden()){
-            child.show(false);
+        if (bottomNavigationLayoutIsHidden != null) {
+            if (bottomNavigationLayoutIsHidden) {
+                if (!child.isHidden()) child.hide(false);
+            }else {
+                if (child.isHidden()) child.show(false);
+            }
         }
 
         updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child));
@@ -148,6 +149,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         if (state instanceof SavedState) {
             SavedState ss = (SavedState) state;
             this.bottomNavigationLayoutIsHidden = ss.isHidden;
+            Log.d(TAG, "onRestoreInstanceState " + ss.isHidden);
         }
     }
 
