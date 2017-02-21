@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.Caij:BottomNavigationLayout:v1.0.0'
+    compile 'com.github.Caij:BottomNavigationLayout:1.0.1'
 }
 ```
 
