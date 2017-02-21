@@ -149,7 +149,6 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         if (state instanceof SavedState) {
             SavedState ss = (SavedState) state;
             this.bottomNavigationLayoutIsHidden = ss.isHidden;
-            Log.d(TAG, "onRestoreInstanceState " + ss.isHidden);
         }
     }
 
