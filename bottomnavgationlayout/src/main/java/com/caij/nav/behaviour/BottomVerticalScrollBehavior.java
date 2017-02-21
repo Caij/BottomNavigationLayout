@@ -139,6 +139,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         final Parcelable superState = super.onSaveInstanceState(parent, child);
         SavedState savedState = new SavedState(superState);
         savedState.isHidden = child.isHidden();
+        Log.d("onSaveInstanceState", savedState.isHidden + "   ");
         return savedState;
     }
 
