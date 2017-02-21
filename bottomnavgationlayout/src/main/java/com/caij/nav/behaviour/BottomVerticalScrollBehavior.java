@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<BottomNavigationLayout> {
     private static final Interpolator INTERPOLATOR = new FastOutSlowInInterpolator();
-    private int mBottomNavHeight;
+    private Boolean bottomNavigationLayoutIsHidden;
 
     ///////////////////////////////////////////////////////////////////////////
     // onBottomBar changes
@@ -41,12 +41,12 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         // First let the parent lay it out
         parent.onLayoutChild(child, layoutDirection);
 
-        child.post(new Runnable() {
-            @Override
-            public void run() {
-                mBottomNavHeight = child.getHeight();
-            }
-        });
+        if (bottomNavigationLayoutIsHidden != null && bottomNavigationLayoutIsHidden && !child.isHidden()) {
+            child.hide(false);
+        }else if (child.isHidden()){
+            child.show(false);
+        }
+
         updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child));
 
         return super.onLayoutChild(parent, child, layoutDirection);
@@ -125,7 +125,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
     private void handleDirection(CoordinatorLayout parent, BottomNavigationLayout child, int scrollDirection) {
         if (child != null && child.isAutoHideEnabled()) {
             if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_DOWN && child.isHidden()) {
-                updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child), -mBottomNavHeight);
+                updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child), - child.getHeight());
                 child.show();
             } else if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_UP && !child.isHidden()) {
                 updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child), 0);
@@ -139,7 +139,6 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         final Parcelable superState = super.onSaveInstanceState(parent, child);
         SavedState savedState = new SavedState(superState);
         savedState.isHidden = child.isHidden();
-        Log.d("onSaveInstanceState", savedState.isHidden + "   ");
         return savedState;
     }
 
@@ -148,12 +147,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         super.onRestoreInstanceState(parent, child, state);
         if (state instanceof SavedState) {
             SavedState ss = (SavedState) state;
-            Log.d("onRestoreInstanceState", ss.isHidden + "   ");
-            if (ss.isHidden) {
-                child.hide(false);
-            }else {
-                child.show(false);
-            }
+            this.bottomNavigationLayoutIsHidden = ss.isHidden;
         }
     }
 
