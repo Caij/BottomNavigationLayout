@@ -1,8 +1,14 @@
 package com.caij.nav.behaviour;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.os.ParcelableCompat;
+import android.support.v4.os.ParcelableCompatCreatorCallbacks;
+import android.support.v4.view.AbsSavedState;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
@@ -22,21 +28,17 @@ import java.util.List;
  * @see VerticalScrollingBehavior
  * @since 25 Mar 2016
  */
-public class BottomVerticalScrollBehavior<V extends View> extends VerticalScrollingBehavior<V> {
+public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<BottomNavigationLayout> {
     private static final Interpolator INTERPOLATOR = new FastOutSlowInInterpolator();
     private int mBottomNavHeight;
-    private WeakReference<BottomNavigationLayout> mViewRef;
 
     ///////////////////////////////////////////////////////////////////////////
     // onBottomBar changes
     ///////////////////////////////////////////////////////////////////////////
     @Override
-    public boolean onLayoutChild(CoordinatorLayout parent, final V child, int layoutDirection) {
+    public boolean onLayoutChild(CoordinatorLayout parent, final BottomNavigationLayout child, int layoutDirection) {
         // First let the parent lay it out
         parent.onLayoutChild(child, layoutDirection);
-        if (child instanceof BottomNavigationLayout) {
-            mViewRef = new WeakReference<>((BottomNavigationLayout) child);
-        }
 
         child.post(new Runnable() {
             @Override
@@ -53,7 +55,7 @@ public class BottomVerticalScrollBehavior<V extends View> extends VerticalScroll
     // SnackBar Handling
     ///////////////////////////////////////////////////////////////////////////
     @Override
-    public boolean layoutDependsOn(CoordinatorLayout parent, V child, View dependency) {
+    public boolean layoutDependsOn(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
         return isDependent(dependency) || super.layoutDependsOn(parent, child, dependency);
     }
 
@@ -62,7 +64,7 @@ public class BottomVerticalScrollBehavior<V extends View> extends VerticalScroll
     }
 
     @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, V child, View dependency) {
+    public boolean onDependentViewChanged(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
         if (isDependent(dependency)) {
             updateSnackBarPosition(parent, child, dependency);
             return false;
@@ -71,17 +73,17 @@ public class BottomVerticalScrollBehavior<V extends View> extends VerticalScroll
         return super.onDependentViewChanged(parent, child, dependency);
     }
 
-    private void updateSnackBarPosition(CoordinatorLayout parent, V child, View dependency) {
+    private void updateSnackBarPosition(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
         updateSnackBarPosition(parent, child, dependency, ViewCompat.getTranslationY(child) - child.getHeight());
     }
 
-    private void updateSnackBarPosition(CoordinatorLayout parent, V child, View dependency, float translationY) {
+    private void updateSnackBarPosition(CoordinatorLayout parent, BottomNavigationLayout child, View dependency, float translationY) {
         if (dependency != null && dependency instanceof Snackbar.SnackbarLayout) {
             ViewCompat.animate(dependency).setInterpolator(INTERPOLATOR).setDuration(80).setStartDelay(0).translationY(translationY).start();
         }
     }
 
-    private Snackbar.SnackbarLayout getSnackBarInstance(CoordinatorLayout parent, V child) {
+    private Snackbar.SnackbarLayout getSnackBarInstance(CoordinatorLayout parent, BottomNavigationLayout child) {
         final List<View> dependencies = parent.getDependencies(child);
         for (int i = 0, z = dependencies.size(); i < z; i++) {
             final View view = dependencies.get(i);
@@ -97,17 +99,17 @@ public class BottomVerticalScrollBehavior<V extends View> extends VerticalScroll
     ///////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void onNestedVerticalScrollUnconsumed(CoordinatorLayout coordinatorLayout, V child, @ScrollDirection int scrollDirection, int currentOverScroll) {
+    public void onNestedVerticalScrollUnconsumed(CoordinatorLayout coordinatorLayout, BottomNavigationLayout child, @ScrollDirection int scrollDirection, int currentOverScroll) {
         // Empty body
     }
 
     @Override
-    public void onNestedVerticalPreScroll(CoordinatorLayout coordinatorLayout, V child, View target, int dx, int dy, int[] consumed, @ScrollDirection int scrollDirection) {
+    public void onNestedVerticalPreScroll(CoordinatorLayout coordinatorLayout, BottomNavigationLayout child, View target, int dx, int dy, int[] consumed, @ScrollDirection int scrollDirection) {
 //        handleDirection(child, scrollDirection);
     }
 
     @Override
-    protected boolean onNestedDirectionFling(CoordinatorLayout coordinatorLayout, V child, View target, float velocityX, float velocityY, boolean consumed, @ScrollDirection int scrollDirection) {
+    protected boolean onNestedDirectionFling(CoordinatorLayout coordinatorLayout, BottomNavigationLayout child, View target, float velocityX, float velocityY, boolean consumed, @ScrollDirection int scrollDirection) {
 //        if (consumed) {
 //            handleDirection(child, scrollDirection);
 //        }
@@ -115,20 +117,73 @@ public class BottomVerticalScrollBehavior<V extends View> extends VerticalScroll
     }
 
     @Override
-    public void onNestedVerticalScrollConsumed(CoordinatorLayout coordinatorLayout, V child, @ScrollDirection int scrollDirection, int currentOverScroll) {
+    public void onNestedVerticalScrollConsumed(CoordinatorLayout coordinatorLayout, BottomNavigationLayout child, @ScrollDirection int scrollDirection, int currentOverScroll) {
         handleDirection(coordinatorLayout, child, scrollDirection);
     }
 
-    private void handleDirection(CoordinatorLayout parent, V child, int scrollDirection) {
-        BottomNavigationLayout bottomNavigationLayout = mViewRef.get();
-        if (bottomNavigationLayout != null && bottomNavigationLayout.isAutoHideEnabled()) {
-            if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_DOWN && bottomNavigationLayout.isHidden()) {
+    private void handleDirection(CoordinatorLayout parent, BottomNavigationLayout child, int scrollDirection) {
+        if (child != null && child.isAutoHideEnabled()) {
+            if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_DOWN && child.isHidden()) {
                 updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child), -mBottomNavHeight);
-                bottomNavigationLayout.show();
-            } else if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_UP && !bottomNavigationLayout.isHidden()) {
+                child.show();
+            } else if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_UP && !child.isHidden()) {
                 updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child), 0);
-                bottomNavigationLayout.hide();
+                child.hide();
             }
         }
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState(CoordinatorLayout parent, BottomNavigationLayout child) {
+        final Parcelable superState = super.onSaveInstanceState(parent, child);
+        SavedState savedState = new SavedState(superState);
+        savedState.isHidden = child.isHidden();
+        return superState;
+    }
+
+    @Override
+    public void onRestoreInstanceState(CoordinatorLayout parent, BottomNavigationLayout child, Parcelable state) {
+        super.onRestoreInstanceState(parent, child, state);
+        if (state instanceof SavedState) {
+            SavedState savedState = new SavedState(state);
+            if (savedState.isHidden) {
+                child.hide(false);
+            }else {
+                child.show(false);
+            }
+        }
+    }
+
+    protected static class SavedState extends AbsSavedState {
+
+        boolean isHidden;
+
+        public SavedState(Parcel source, ClassLoader loader) {
+            super(source, loader);
+            isHidden = source.readByte() != 0;
+        }
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeByte((byte) (isHidden ? 1 : 0));
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
+                    @Override
+                    public SavedState createFromParcel(Parcel source, ClassLoader loader) {
+                        return new SavedState(source, loader);
+                    }
+
+                    @Override
+                    public SavedState[] newArray(int size) {
+                        return new SavedState[size];
+                    }
+                });
     }
 }
