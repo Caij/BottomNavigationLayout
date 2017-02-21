@@ -11,6 +11,7 @@ import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.AbsSavedState;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Interpolator;
 
@@ -146,6 +147,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         super.onRestoreInstanceState(parent, child, state);
         if (state instanceof SavedState) {
             SavedState savedState = new SavedState(state);
+            Log.d("onRestoreInstanceState", savedState.isHidden + "   ");
             if (savedState.isHidden) {
                 child.hide(false);
             }else {
