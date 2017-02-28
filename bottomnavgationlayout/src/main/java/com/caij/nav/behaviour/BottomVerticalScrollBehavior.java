@@ -46,6 +46,9 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
             }else {
                 if (child.isHidden()) child.show(false);
             }
+
+            // on restore once
+            bottomNavigationLayoutIsHidden = null;
         }
 
         updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child));
