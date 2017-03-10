@@ -86,7 +86,8 @@ public class NavigationItemView extends FrameLayout {
                     tabItem.getInactiveIcon());
             ivIcon.setImageDrawable(states);
         } else {
-            DrawableCompat.setTintList(tabItem.getInactiveIcon(), new ColorStateList(
+            Drawable drawable = DrawableCompat.wrap(tabItem.getInactiveIcon());
+            DrawableCompat.setTintList(drawable, new ColorStateList(
                     new int[][]{
                             new int[]{android.R.attr.state_selected}, //1
                             new int[]{-android.R.attr.state_selected}, //2
@@ -98,7 +99,7 @@ public class NavigationItemView extends FrameLayout {
                             inActiveColor //3
                     }
             ));
-            ivIcon.setImageDrawable(tabItem.getInactiveIcon());
+            ivIcon.setImageDrawable(drawable);
         }
 
         setText(tabItem.getTitle());
