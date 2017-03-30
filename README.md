@@ -14,11 +14,11 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.Caij:BottomNavigationLayout:1.3'
+    compile 'com.github.Caij:BottomNavigationLayout:1.4.0'
 }
 ```
 
-###Thanks
+### Thanks
 com.ashokvarma.android:bottom-navigation-bar
 
 
