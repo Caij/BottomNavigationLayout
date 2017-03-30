@@ -74,7 +74,7 @@ public class NavigationItemView extends FrameLayout {
 
     public void initialise(NavigationItem tabItem) {
         ivIcon.setSelected(false);
-        activeColor = tabItem.getActiveColor() != -1 ? tabItem.getInactiveColor() : fetchContextColor(getContext(), R.attr.colorAccent);
+        activeColor = tabItem.getActiveColor() != -1 ? tabItem.getActiveColor() : fetchContextColor(getContext(), R.attr.colorAccent);
         inActiveColor = tabItem.getInactiveColor() != -1 ? tabItem.getInactiveColor() : Color.LTGRAY;
         if (tabItem.isInActiveIconAvailable()) {
             StateListDrawable states = new StateListDrawable();
