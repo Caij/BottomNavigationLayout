@@ -103,6 +103,7 @@ public class NavigationItemView extends FrameLayout {
         }
 
         setText(tabItem.getTitle());
+        tvLabel.setTextColor(inActiveColor);
     }
 
     public static int fetchContextColor(Context context, int androidAttribute) {
