@@ -62,6 +62,10 @@ public class NavigationItemView extends FrameLayout {
         return tvBadge;
     }
 
+    public ImageView getIcon() {
+        return ivIcon;
+    }
+
     public void select() {
         ivIcon.setSelected(true);
         tvLabel.setTextColor(activeColor);
