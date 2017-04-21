@@ -62,18 +62,22 @@ public class NavigationItemView extends FrameLayout {
         return tvBadge;
     }
 
-    public ImageView getIcon() {
+    public ImageView getIconImageView() {
         return ivIcon;
+    }
+
+    public TextView getLabelTextView() {
+        return tvLabel;
     }
 
     public void select() {
         ivIcon.setSelected(true);
-        tvLabel.setTextColor(activeColor);
+        tvLabel.setSelected(true);
     }
 
     public void unSelect() {
         ivIcon.setSelected(false);
-        tvLabel.setTextColor(inActiveColor);
+        tvLabel.setSelected(false);
     }
 
     public void initialise(NavigationItem tabItem) {
@@ -105,9 +109,19 @@ public class NavigationItemView extends FrameLayout {
             ));
             ivIcon.setImageDrawable(drawable);
         }
-
         setText(tabItem.getTitle());
-        tvLabel.setTextColor(inActiveColor);
+        tvLabel.setTextColor(new ColorStateList(
+                new int[][]{
+                        new int[]{android.R.attr.state_selected}, //1
+                        new int[]{-android.R.attr.state_selected}, //2
+                        new int[]{}
+                },
+                new int[]{
+                        activeColor, //1
+                        inActiveColor, //2
+                        inActiveColor //3
+                }
+        ));
     }
 
     public static int fetchContextColor(Context context, int androidAttribute) {
