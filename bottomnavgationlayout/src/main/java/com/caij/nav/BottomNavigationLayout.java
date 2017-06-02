@@ -88,12 +88,14 @@ public class BottomNavigationLayout extends LinearLayout {
         for (NavigationItem tabItem : mBottomNavigationItems){
             NavigationItemView navigationItemView = new NavigationItemView(getContext());
 
-            navigationItemView.getLabelTextView().setTextSize(tabItemTextSize, TypedValue.COMPLEX_UNIT_PX);
-            navigationItemView.getTvBadge().setTextSize(tabItemBadgeTextSize, TypedValue.COMPLEX_UNIT_PX);
+            navigationItemView.getLabelTextView().setTextSize(TypedValue.COMPLEX_UNIT_PX, tabItemTextSize);
+            navigationItemView.getTvBadge().setTextSize(TypedValue.COMPLEX_UNIT_PX, tabItemBadgeTextSize);
+
             ViewGroup.LayoutParams layoutParams = navigationItemView.getIconImageView().getLayoutParams();
             layoutParams.height = tabItemImageSize;
             layoutParams.width = tabItemImageSize;
             navigationItemView.getIconImageView().setLayoutParams(layoutParams);
+
             navigationItemView.getTvBadge().setBackgroundColor(tabItemBadgeColor);
 
             setUp(navigationItemView, tabItem);
@@ -103,7 +105,7 @@ public class BottomNavigationLayout extends LinearLayout {
 
     private void setUp(final NavigationItemView navigationItemView, final NavigationItem tabItem) {
         navigationItemView.initialise(tabItem);
-        LinearLayout.LayoutParams layoutParams = new LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams layoutParams = new LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.weight = 1;
         addView(navigationItemView, layoutParams);
 
