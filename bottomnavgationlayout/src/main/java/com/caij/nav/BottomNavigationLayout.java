@@ -1,6 +1,7 @@
 package com.caij.nav;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.CoordinatorLayout;
@@ -8,7 +9,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.util.AttributeSet;
-import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
@@ -38,29 +39,43 @@ public class BottomNavigationLayout extends LinearLayout {
     private static final int DEFAULT_ANIMATION_DURATION = 200;
     private int mRippleAnimationDuration = (int) (DEFAULT_ANIMATION_DURATION * 2.5);
 
+    private int tabItemBadgeTextSize;
+    private int tabItemImageSize;
+    private int tabItemTextSize;
+    private int tabItemBadgeColor;
+
+
     public BottomNavigationLayout(Context context) {
         super(context);
-        init();
+        init(context, null, 0, 0);
     }
 
     public BottomNavigationLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context, attrs, 0, 0);
     }
 
     public BottomNavigationLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context, attrs, defStyleAttr, 0);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public BottomNavigationLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init();
+        init(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    private void init(){
-        ViewCompat.setElevation(this, getResources().getDimension(R.dimen.bottom_navigation_elevation));
+    private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes){
+//        ViewCompat.setElevation(this, getResources().getDimension(R.dimen.bottom_navigation_elevation));
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationLayout, defStyleAttr, defStyleRes);
+
+        tabItemBadgeTextSize = typedArray.getDimensionPixelOffset(R.styleable.BottomNavigationLayout_tabItemBadgeTextSize, getResources().getDimensionPixelOffset(R.dimen.nav_item_badge_text_size));
+        tabItemImageSize = typedArray.getDimensionPixelOffset(R.styleable.BottomNavigationLayout_tabItemImageSize, getResources().getDimensionPixelOffset(R.dimen.nav_item_icon_width));
+        tabItemTextSize = typedArray.getDimensionPixelOffset(R.styleable.BottomNavigationLayout_tabItemTextSize, getResources().getDimensionPixelOffset(R.dimen.nav_item_label_text_size));
+        tabItemBadgeColor = typedArray.getColor(R.styleable.BottomNavigationLayout_tabItemBadgeColor, getResources().getColor(R.color.default_badge_color));
+
+        typedArray.recycle();
     }
 
     public BottomNavigationLayout addItem(NavigationItem item) {
@@ -72,6 +87,15 @@ public class BottomNavigationLayout extends LinearLayout {
     public void initialise() {
         for (NavigationItem tabItem : mBottomNavigationItems){
             NavigationItemView navigationItemView = new NavigationItemView(getContext());
+
+            navigationItemView.getLabelTextView().setTextSize(tabItemTextSize, TypedValue.COMPLEX_UNIT_PX);
+            navigationItemView.getTvBadge().setTextSize(tabItemBadgeTextSize, TypedValue.COMPLEX_UNIT_PX);
+            ViewGroup.LayoutParams layoutParams = navigationItemView.getIconImageView().getLayoutParams();
+            layoutParams.height = tabItemImageSize;
+            layoutParams.width = tabItemImageSize;
+            navigationItemView.getIconImageView().setLayoutParams(layoutParams);
+            navigationItemView.getTvBadge().setBackgroundColor(tabItemBadgeColor);
+
             setUp(navigationItemView, tabItem);
             selectTab(0, false);
         }
