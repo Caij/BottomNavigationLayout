@@ -43,6 +43,7 @@ public class BottomNavigationLayout extends LinearLayout {
     private int tabItemImageSize;
     private int tabItemTextSize;
     private int tabItemBadgeColor;
+    private boolean isShowText;
 
 
     public BottomNavigationLayout(Context context) {
@@ -74,6 +75,7 @@ public class BottomNavigationLayout extends LinearLayout {
         tabItemImageSize = typedArray.getDimensionPixelOffset(R.styleable.BottomNavigationLayout_tabItemImageSize, getResources().getDimensionPixelOffset(R.dimen.nav_item_icon_width));
         tabItemTextSize = typedArray.getDimensionPixelOffset(R.styleable.BottomNavigationLayout_tabItemTextSize, getResources().getDimensionPixelOffset(R.dimen.nav_item_label_text_size));
         tabItemBadgeColor = typedArray.getColor(R.styleable.BottomNavigationLayout_tabItemBadgeColor, getResources().getColor(R.color.default_badge_color));
+        isShowText = typedArray.getBoolean(R.styleable.BottomNavigationLayout_isShowText, true);
 
         typedArray.recycle();
     }
@@ -97,6 +99,12 @@ public class BottomNavigationLayout extends LinearLayout {
             navigationItemView.getIconImageView().setLayoutParams(layoutParams);
 
             navigationItemView.getTvBadge().setBackgroundColor(tabItemBadgeColor);
+
+            if (isShowText) {
+                navigationItemView.getLabelTextView().setVisibility(VISIBLE);
+            }else {
+                navigationItemView.getLabelTextView().setVisibility(GONE);
+            }
 
             setUp(navigationItemView, tabItem);
             selectTab(0, false);
