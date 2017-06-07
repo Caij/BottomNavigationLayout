@@ -113,7 +113,7 @@ public class BottomNavigationLayout extends LinearLayout {
 
     private void setUp(final NavigationItemView navigationItemView, final NavigationItem tabItem) {
         navigationItemView.initialise(tabItem);
-        LinearLayout.LayoutParams layoutParams = new LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutParams = new LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
         layoutParams.weight = 1;
         addView(navigationItemView, layoutParams);
 
