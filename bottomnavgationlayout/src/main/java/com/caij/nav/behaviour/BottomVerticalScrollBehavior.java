@@ -3,19 +3,20 @@ package com.caij.nav.behaviour;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
-import android.support.v4.view.AbsSavedState;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.animation.FastOutSlowInInterpolator;
-import android.util.Log;
+
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.os.ParcelableCompat;
+import androidx.core.os.ParcelableCompatCreatorCallbacks;
+import androidx.core.view.ViewCompat;
+import androidx.customview.view.AbsSavedState;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
+
 import android.view.View;
 import android.view.animation.Interpolator;
 
 
 import com.caij.nav.BottomNavigationLayout;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
