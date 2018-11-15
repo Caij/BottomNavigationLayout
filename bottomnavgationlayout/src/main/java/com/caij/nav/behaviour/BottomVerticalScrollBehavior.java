@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.os.ParcelableCompat;
 import androidx.core.os.ParcelableCompatCreatorCallbacks;
@@ -15,6 +16,7 @@ import androidx.customview.view.AbsSavedState;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Interpolator;
 
@@ -81,7 +83,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
     // SnackBar Handling
     ///////////////////////////////////////////////////////////////////////////
     @Override
-    public boolean layoutDependsOn(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
+    public boolean layoutDependsOn(@NonNull CoordinatorLayout parent, @NonNull BottomNavigationLayout child, @NonNull View dependency) {
         return isDependent(dependency) || super.layoutDependsOn(parent, child, dependency);
     }
 
@@ -90,21 +92,20 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
     }
 
     @Override
-    public void onDependentViewRemoved(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
-        updateScrollingForSnackbar(dependency, true);
+    public void onDependentViewRemoved(@NonNull CoordinatorLayout parent, @NonNull BottomNavigationLayout child, @NonNull View dependency) {
+        if (dependency instanceof Snackbar.SnackbarLayout) {
+            snackBar = null;
+        }
         super.onDependentViewRemoved(parent, child, dependency);
     }
 
-    private void updateScrollingForSnackbar(View dependency, boolean enabled) {
-        if (dependency instanceof Snackbar.SnackbarLayout) {
-            if (enabled) snackBar = null;
-            else snackBar = dependency;
-        }
-    }
-
     @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
-        updateScrollingForSnackbar(dependency, false);
+    public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, @NonNull BottomNavigationLayout child, @NonNull View dependency) {
+        if (dependency instanceof Snackbar.SnackbarLayout) {
+            snackBar = dependency;
+        } else {
+            snackBar = null;
+        }
         return super.onDependentViewChanged(parent, child, dependency);
     }
 
@@ -117,6 +118,9 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
             dependency.setPadding(dependency.getPaddingLeft(),
                     dependency.getPaddingTop(), dependency.getPaddingRight(), targetPadding
             );
+            Log.d(TAG, "updateSnackBarPosition Snackbar");
+        } else {
+            Log.d(TAG, "updateSnackBarPosition NULL");
         }
     }
 
