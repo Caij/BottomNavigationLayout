@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.core.view.ViewPropertyAnimatorUpdateListener;
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -31,20 +32,12 @@ public class BottomNavigationLayout extends LinearLayout {
     private ArrayList<NavigationItem> mBottomNavigationItems;
     private int mSelectPosition;
     private OnTabSelectedListener mTabSelectedListener;
-    private boolean autoHideEnabled = true;
-    private boolean mIsHidden;
-
-    private ViewPropertyAnimatorCompat mTranslationAnimator;
-
-    private static final int DEFAULT_ANIMATION_DURATION = 200;
-    private int mRippleAnimationDuration = (int) (DEFAULT_ANIMATION_DURATION * 2.5);
 
     private int tabItemBadgeTextSize;
     private int tabItemImageSize;
     private int tabItemTextSize;
     private int tabItemBadgeColor;
     private boolean isShowText;
-
 
     public BottomNavigationLayout(Context context) {
         super(context);
@@ -180,85 +173,8 @@ public class BottomNavigationLayout extends LinearLayout {
         mTabSelectedListener = onTabSelectedListener;
     }
 
-    public boolean isAutoHideEnabled() {
-        return autoHideEnabled;
-    }
-
-    /**
-     * show with animation
-     */
-    public void show() {
-        show(true);
-    }
-
-    /**
-     * @param animate is animation enabled for show
-     */
-    public void show(boolean animate) {
-        mIsHidden = false;
-        setTranslationY(0, animate);
-    }
-
-    /**
-     * hide with animation
-     */
-    public void hide() {
-        hide(true);
-    }
-
-    /**
-     * @param animate is animation enabled for hide
-     */
-    public void hide(boolean animate) {
-        mIsHidden = true;
-        setTranslationY(this.getHeight(), animate);
-    }
-
-    /**
-     * @param offset  offset needs to be set
-     * @param animate is animation enabled for translation
-     */
-    private void setTranslationY(int offset, boolean animate) {
-        if (animate) {
-            animateOffset(offset);
-        } else {
-            if (mTranslationAnimator != null) {
-                mTranslationAnimator.cancel();
-            }
-            this.setTranslationY(offset);
-        }
-    }
-
     public NavigationItemView getTab(int position) {
         return (NavigationItemView) getChildAt(position);
-    }
-
-    /**
-     * Internal Method
-     * <p/>
-     * used to set animation and
-     * takes care of cancelling current animation
-     * and sets duration and interpolator for animation
-     *
-     * @param offset translation offset that needs to set with animation
-     */
-    private void animateOffset(final int offset) {
-        if (mTranslationAnimator == null) {
-            mTranslationAnimator = ViewCompat.animate(this);
-            mTranslationAnimator.setDuration(mRippleAnimationDuration);
-            mTranslationAnimator.setInterpolator(INTERPOLATOR);
-        } else {
-            mTranslationAnimator.cancel();
-        }
-        mTranslationAnimator.translationY(offset).start();
-    }
-
-    public boolean isHidden() {
-        return mIsHidden;
-    }
-
-    public void setAutoHideEnabled(boolean autoHideEnabled) {
-        this.autoHideEnabled = autoHideEnabled;
     }
 
     public interface OnTabSelectedListener {
@@ -285,4 +201,5 @@ public class BottomNavigationLayout extends LinearLayout {
          */
         void onTabReselected(int position);
     }
+
 }

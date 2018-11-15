@@ -3,6 +3,8 @@ package com.caij.bottomnavigationlayout;
 import android.content.Context;
 import android.content.res.TypedArray;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.TextView;
 
 import com.caij.nav.BottomNavigationLayout;
 import com.caij.nav.NavigationItem;
+import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,9 +44,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabReselected(int position) {
-
+                Snackbar snackbar = Snackbar.make(bottomNavigationLayout, "Tips： 单击回到顶部， 双击可直接刷新", Snackbar.LENGTH_LONG);
+                snackbar.show();
             }
         });
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
     public static int fetchContextColor(Context context, int androidAttribute) {

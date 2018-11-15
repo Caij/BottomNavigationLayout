@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.TextView;
 
 import com.caij.nav.BottomNavigationLayout;
 import com.caij.nav.NavigationItem;
+import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity2 extends AppCompatActivity {
 
@@ -17,7 +20,7 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomNavigationLayout bottomNavigationLayout = (BottomNavigationLayout) findViewById(R.id.bottom_nav_layout);
+        final BottomNavigationLayout bottomNavigationLayout = (BottomNavigationLayout) findViewById(R.id.bottom_nav_layout);
         int color = fetchContextColor(this, R.attr.colorPrimary);
         bottomNavigationLayout.addItem(new NavigationItem("首页", getResources().getDrawable(R.mipmap.icon_home)).setActiveColor(color))
                 .addItem(new NavigationItem("首页", getResources().getDrawable(R.mipmap.icon_message)).setActiveColor(color))
@@ -41,9 +44,14 @@ public class MainActivity2 extends AppCompatActivity {
 
             @Override
             public void onTabReselected(int position) {
-
+                Snackbar snackbar = Snackbar.make(bottomNavigationLayout, "Tips： 单击回到顶部， 双击可直接刷新", Snackbar.LENGTH_LONG);
+                snackbar.show();
             }
         });
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
     }
 
     public static int fetchContextColor(Context context, int androidAttribute) {

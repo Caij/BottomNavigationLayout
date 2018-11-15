@@ -1,6 +1,7 @@
 package com.caij.nav.behaviour;
 
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -8,9 +9,12 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.os.ParcelableCompat;
 import androidx.core.os.ParcelableCompatCreatorCallbacks;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.core.view.ViewPropertyAnimatorUpdateListener;
 import androidx.customview.view.AbsSavedState;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
 
@@ -31,7 +35,23 @@ import java.util.List;
 public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<BottomNavigationLayout> {
     private static final Interpolator INTERPOLATOR = new FastOutSlowInInterpolator();
     private static final String TAG = "BottomBehavior";
-    private Boolean bottomNavigationLayoutIsHidden;
+    private Boolean restoreBottomNavigationLayoutIsHidden;
+    private boolean autoHideEnabled = true;
+    private int mSnackBarHeight = -1;
+
+    private View snackBar;
+    private boolean mIsHidden;
+    private ViewPropertyAnimatorCompat mTranslationAnimator;
+
+    protected static final int ENTER_ANIMATION_DURATION = 225;
+
+    public BottomVerticalScrollBehavior(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public BottomVerticalScrollBehavior() {
+
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // onBottomBar changes
@@ -41,18 +61,18 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         // First let the parent lay it out
         parent.onLayoutChild(child, layoutDirection);
 
-        if (bottomNavigationLayoutIsHidden != null) {
-            if (bottomNavigationLayoutIsHidden) {
-                if (!child.isHidden()) child.hide(false);
+        if (restoreBottomNavigationLayoutIsHidden != null) {
+            if (restoreBottomNavigationLayoutIsHidden) {
+                if (!isHidden()) hide(child, false);
             }else {
-                if (child.isHidden()) child.show(false);
+                if (isHidden()) show(child, false);
             }
 
             // on restore once
-            bottomNavigationLayoutIsHidden = null;
+            restoreBottomNavigationLayoutIsHidden = null;
         }
 
-        updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child));
+        updateSnackBarPosition(child, getSnackBarInstance(parent, child));
 
         return super.onLayoutChild(parent, child, layoutDirection);
     }
@@ -70,22 +90,33 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
     }
 
     @Override
-    public boolean onDependentViewChanged(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
-        if (isDependent(dependency)) {
-            updateSnackBarPosition(parent, child, dependency);
-            return false;
-        }
+    public void onDependentViewRemoved(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
+        updateScrollingForSnackbar(dependency, true);
+        super.onDependentViewRemoved(parent, child, dependency);
+    }
 
+    private void updateScrollingForSnackbar(View dependency, boolean enabled) {
+        if (dependency instanceof Snackbar.SnackbarLayout) {
+            if (enabled) snackBar = null;
+            else snackBar = dependency;
+        }
+    }
+
+    @Override
+    public boolean onDependentViewChanged(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
+        updateScrollingForSnackbar(dependency, false);
         return super.onDependentViewChanged(parent, child, dependency);
     }
 
-    private void updateSnackBarPosition(CoordinatorLayout parent, BottomNavigationLayout child, View dependency) {
-        updateSnackBarPosition(parent, child, dependency, ViewCompat.getTranslationY(child) - child.getHeight());
-    }
-
-    private void updateSnackBarPosition(CoordinatorLayout parent, BottomNavigationLayout child, View dependency, float translationY) {
-        if (dependency != null && dependency instanceof Snackbar.SnackbarLayout) {
-            ViewCompat.animate(dependency).setInterpolator(INTERPOLATOR).setDuration(80).setStartDelay(0).translationY(translationY).start();
+    private void updateSnackBarPosition(BottomNavigationLayout child, View dependency) {
+        if (dependency instanceof Snackbar.SnackbarLayout) {
+            if (mSnackBarHeight == -1) {
+                mSnackBarHeight = dependency.getHeight();
+            }
+            int targetPadding = (int) (child.getHeight() - child.getTranslationY());
+            dependency.setPadding(dependency.getPaddingLeft(),
+                    dependency.getPaddingTop(), dependency.getPaddingRight(), targetPadding
+            );
         }
     }
 
@@ -111,13 +142,13 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
 
     @Override
     public void onNestedVerticalPreScroll(CoordinatorLayout coordinatorLayout, BottomNavigationLayout child, View target, int dx, int dy, int[] consumed, @ScrollDirection int scrollDirection) {
-//        handleDirection(child, scrollDirection);
+//        handleDirection(coordinatorLayout, child, scrollDirection);
     }
 
     @Override
     protected boolean onNestedDirectionFling(CoordinatorLayout coordinatorLayout, BottomNavigationLayout child, View target, float velocityX, float velocityY, boolean consumed, @ScrollDirection int scrollDirection) {
 //        if (consumed) {
-//            handleDirection(child, scrollDirection);
+//            handleDirection(coordinatorLayout, child, scrollDirection);
 //        }
         return consumed;
     }
@@ -128,22 +159,32 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
     }
 
     private void handleDirection(CoordinatorLayout parent, BottomNavigationLayout child, int scrollDirection) {
-        if (child != null && child.isAutoHideEnabled()) {
-            if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_DOWN && child.isHidden()) {
-                updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child), - child.getHeight());
-                child.show();
-            } else if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_UP && !child.isHidden()) {
-                updateSnackBarPosition(parent, child, getSnackBarInstance(parent, child), 0);
-                child.hide();
+        if (child != null && isAutoHideEnabled()) {
+            if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_DOWN && isHidden()) {
+                show(child);
+            } else if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_UP && !isHidden()) {
+                hide(child);
             }
         }
+    }
+
+    public boolean isAutoHideEnabled() {
+        return autoHideEnabled;
+    }
+
+    public void setAutoHideEnabled(boolean autoHideEnabled) {
+        this.autoHideEnabled = autoHideEnabled;
+    }
+
+    public boolean isHidden() {
+        return mIsHidden;
     }
 
     @Override
     public Parcelable onSaveInstanceState(CoordinatorLayout parent, BottomNavigationLayout child) {
         final Parcelable superState = super.onSaveInstanceState(parent, child);
         SavedState savedState = new SavedState(superState);
-        savedState.isHidden = child.isHidden();
+        savedState.isHidden = isHidden();
         return savedState;
     }
 
@@ -152,8 +193,81 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         super.onRestoreInstanceState(parent, child, state);
         if (state instanceof SavedState) {
             SavedState ss = (SavedState) state;
-            this.bottomNavigationLayoutIsHidden = ss.isHidden;
+            this.restoreBottomNavigationLayoutIsHidden = ss.isHidden;
         }
+    }
+
+    /**
+     * show with animation
+     */
+    public void show(View view) {
+        show(view, true);
+    }
+
+    /**
+     * @param animate is animation enabled for show
+     */
+    public void show(View view, boolean animate) {
+        mIsHidden = false;
+        setTranslationY(view, 0, animate);
+    }
+
+    /**
+     * hide with animation
+     */
+    public void hide(View view) {
+        hide(view, true);
+    }
+
+    /**
+     * @param animate is animation enabled for hide
+     */
+    public void hide(View view, boolean animate) {
+        mIsHidden = true;
+        setTranslationY(view, view.getHeight(), animate);
+    }
+
+    /**
+     * @param offset  offset needs to be set
+     * @param animate is animation enabled for translation
+     */
+    private void setTranslationY(View view, int offset, boolean animate) {
+        if (animate) {
+            animateOffset(view, offset);
+        } else {
+            if (mTranslationAnimator != null) {
+                mTranslationAnimator.cancel();
+            }
+            view.setTranslationY(offset);
+        }
+    }
+
+    /**
+     * Internal Method
+     * <p/>
+     * used to set animation and
+     * takes care of cancelling current animation
+     * and sets duration and interpolator for animation
+     *
+     * @param offset translation offset that needs to set with animation
+     */
+    private void animateOffset(View view, final int offset) {
+        if (mTranslationAnimator == null) {
+            mTranslationAnimator = ViewCompat.animate(view);
+            mTranslationAnimator.setDuration(ENTER_ANIMATION_DURATION);
+            mTranslationAnimator.setInterpolator(INTERPOLATOR);
+        } else {
+            mTranslationAnimator.cancel();
+        }
+
+        mTranslationAnimator.setUpdateListener(new ViewPropertyAnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(View view) {
+                updateSnackBarPosition((BottomNavigationLayout) view, snackBar);
+            }
+        });
+
+        mTranslationAnimator.translationY(offset).start();
     }
 
     protected static class SavedState extends AbsSavedState {
