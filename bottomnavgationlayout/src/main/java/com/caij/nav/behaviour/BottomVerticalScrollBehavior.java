@@ -118,9 +118,6 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
             dependency.setPadding(dependency.getPaddingLeft(),
                     dependency.getPaddingTop(), dependency.getPaddingRight(), targetPadding
             );
-            Log.d(TAG, "updateSnackBarPosition Snackbar");
-        } else {
-            Log.d(TAG, "updateSnackBarPosition NULL");
         }
     }
 
