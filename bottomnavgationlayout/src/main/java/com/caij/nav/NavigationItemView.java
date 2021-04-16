@@ -72,7 +72,7 @@ public class NavigationItemView extends FrameLayout {
         ivIcon.setSelected(true);
         tvLabel.setSelected(true);
         if (navigationItem != null && navigationItem.type == NavigationItem.TYPE_URL) {
-            navigationItem.imageLoader.loadTabImage(ivIcon, navigationItem.selectUrl);
+            navigationItem.imageLoader.loadSelectTabImage(ivIcon, navigationItem.selectUrl);
         }
     }
 
@@ -80,7 +80,7 @@ public class NavigationItemView extends FrameLayout {
         ivIcon.setSelected(false);
         tvLabel.setSelected(false);
         if (navigationItem != null && navigationItem.type == NavigationItem.TYPE_URL) {
-            navigationItem.imageLoader.loadSelectTabImage(ivIcon, navigationItem.url);
+            navigationItem.imageLoader.loadTabImage(ivIcon, navigationItem.url);
         }
     }
 
