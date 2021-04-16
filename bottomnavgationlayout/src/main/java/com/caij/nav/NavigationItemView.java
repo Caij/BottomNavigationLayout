@@ -79,6 +79,9 @@ public class NavigationItemView extends FrameLayout {
     public void unSelect() {
         ivIcon.setSelected(false);
         tvLabel.setSelected(false);
+        if (navigationItem != null && navigationItem.type == NavigationItem.TYPE_URL) {
+            navigationItem.imageLoader.loadTabImage(ivIcon, navigationItem.url);
+        }
     }
 
     public void initialise(NavigationItem tabItem) {

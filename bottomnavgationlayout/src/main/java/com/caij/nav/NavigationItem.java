@@ -47,8 +47,8 @@ public class NavigationItem {
 
     public NavigationItem(String title, String url, String selectUrl, ImageLoader imageLoader) {
         this.title = title;
-        this.selectUrl = url;
-        this.url = selectUrl;
+        this.selectUrl = selectUrl;
+        this.url = url;
         this.imageLoader = imageLoader;
         type = TYPE_URL;
     }
