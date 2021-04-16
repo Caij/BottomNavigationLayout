@@ -6,4 +6,5 @@ public interface ImageLoader {
 
     void loadTabImage(ImageView imageView, String url);
 
+    void loadSelectTabImage(ImageView ivIcon, String url);
 }
