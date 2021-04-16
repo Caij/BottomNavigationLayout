@@ -3,7 +3,6 @@ package com.caij.nav;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -19,8 +18,7 @@ public class NavigationItemView extends FrameLayout {
     private ImageView ivIcon;
     private TextView tvLabel;
     private TextView tvBadge;
-    private int activeColor;
-    private int inActiveColor;
+    private NavigationItem navigationItem;
 
     public NavigationItemView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -73,6 +71,9 @@ public class NavigationItemView extends FrameLayout {
     public void select() {
         ivIcon.setSelected(true);
         tvLabel.setSelected(true);
+        if (navigationItem != null && navigationItem.type == NavigationItem.TYPE_URL) {
+            navigationItem.imageLoader.loadTabImage(ivIcon, navigationItem.selectUrl);
+        }
     }
 
     public void unSelect() {
@@ -81,20 +82,19 @@ public class NavigationItemView extends FrameLayout {
     }
 
     public void initialise(NavigationItem tabItem) {
+        this.navigationItem = tabItem;
         ivIcon.setSelected(false);
-        activeColor = tabItem.getActiveColor() != -1 ? tabItem.getActiveColor() : fetchContextColor(getContext(), R.attr.colorAccent);
-        inActiveColor = tabItem.getInactiveColor() != -1 ? tabItem.getInactiveColor() : Color.LTGRAY;
-        if (tabItem.isInActiveIconAvailable()) {
+        if (tabItem.type == NavigationItem.TYPE_DRAWABLE) {
             StateListDrawable states = new StateListDrawable();
             states.addState(new int[]{android.R.attr.state_selected},
-                    tabItem.getActiveIcon());
+                    tabItem.selectIcon);
             states.addState(new int[]{-android.R.attr.state_selected},
-                    tabItem.getInactiveIcon());
+                    tabItem.icon);
             states.addState(new int[]{},
-                    tabItem.getInactiveIcon());
+                    tabItem.icon);
             ivIcon.setImageDrawable(states);
-        } else {
-            Drawable drawable = DrawableCompat.wrap(tabItem.getInactiveIcon());
+        } else if (tabItem.type == NavigationItem.TYPE_RES) {
+            Drawable drawable = DrawableCompat.wrap(tabItem.icon);
             DrawableCompat.setTintList(drawable, new ColorStateList(
                     new int[][]{
                             new int[]{android.R.attr.state_selected}, //1
@@ -102,14 +102,16 @@ public class NavigationItemView extends FrameLayout {
                             new int[]{}
                     },
                     new int[]{
-                            activeColor, //1
-                            inActiveColor, //2
-                            inActiveColor //3
+                            tabItem.selectDrawableTintColor, //1
+                            tabItem.drawableTintColor, //2
+                            tabItem.drawableTintColor //3
                     }
             ));
             ivIcon.setImageDrawable(drawable);
+        } else {
+            navigationItem.imageLoader.loadTabImage(ivIcon, tabItem.url);
         }
-        setText(tabItem.getTitle());
+        setText(tabItem.title);
         tvLabel.setTextColor(new ColorStateList(
                 new int[][]{
                         new int[]{android.R.attr.state_selected}, //1
@@ -117,21 +119,10 @@ public class NavigationItemView extends FrameLayout {
                         new int[]{}
                 },
                 new int[]{
-                        activeColor, //1
-                        inActiveColor, //2
-                        inActiveColor //3
+                        tabItem.selectTextColor, //1
+                        tabItem.textColor, //2
+                        tabItem.textColor //3
                 }
         ));
-    }
-
-    public static int fetchContextColor(Context context, int androidAttribute) {
-        TypedValue typedValue = new TypedValue();
-
-        TypedArray a = context.obtainStyledAttributes(typedValue.data, new int[]{androidAttribute});
-        int color = a.getColor(0, 0);
-
-        a.recycle();
-
-        return color;
     }
 }

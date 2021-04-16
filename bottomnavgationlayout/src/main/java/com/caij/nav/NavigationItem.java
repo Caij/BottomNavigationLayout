@@ -8,57 +8,63 @@ import android.graphics.drawable.Drawable;
 
 public class NavigationItem {
 
-    private Drawable mActiveIcon;
-    private Drawable mInactiveIcon;
-    private int mInactiveColor = -1;
-    private int mActiveColor = -1;
-    private String mTitle;
+    public static int TYPE_DRAWABLE = 1;
+    public static int TYPE_RES = 2;
+    public static int TYPE_URL = 3;
 
-    private boolean inActiveIconAvailable = false;
+    public Drawable selectIcon;
+    public Drawable icon;
 
-    public NavigationItem(String title, Drawable icon) {
-        this.mInactiveIcon = icon;
-        this.mTitle = title;
+    public int drawableTintColor = -1;
+    public int selectDrawableTintColor = -1;
+
+    public String selectUrl;
+    public String url;
+
+    public String title;
+
+    public final int type;
+
+    public int textColor = -1;
+    public int selectTextColor = -1;
+
+    public ImageLoader imageLoader;
+
+    public NavigationItem(String title, Drawable icon, Drawable selectIcon) {
+        this.icon = icon;
+        this.title = title;
+        this.selectIcon = selectIcon;
+        type = TYPE_DRAWABLE;
     }
 
-    public NavigationItem setActiveIcon(Drawable inactiveIcon) {
-        this.mActiveIcon = inactiveIcon;
-        inActiveIconAvailable = true;
-        return this;
+    public NavigationItem(String title, Drawable icon, int activeDrawableColor, int inactiveDrawableColor) {
+        this.icon = icon;
+        this.title = title;
+        this.selectDrawableTintColor = activeDrawableColor;
+        this.drawableTintColor = inactiveDrawableColor;
+        type = TYPE_RES;
+    }
+
+    public NavigationItem(String title, String url, String selectUrl, ImageLoader imageLoader) {
+        this.title = title;
+        this.selectUrl = url;
+        this.url = selectUrl;
+        this.imageLoader = imageLoader;
+        type = TYPE_URL;
     }
 
     public NavigationItem setInactiveColor(int inactiveColor) {
-        this.mInactiveColor = inactiveColor;
+        this.drawableTintColor = inactiveColor;
         return this;
     }
 
-    public Drawable getActiveIcon() {
-        return mActiveIcon;
+    public NavigationItem setTextColor(int textColor) {
+        this.textColor = textColor;
+        return this;
     }
 
-    public Drawable getInactiveIcon() {
-        return mInactiveIcon;
-    }
-
-
-    public int getInactiveColor() {
-        return mInactiveColor;
-    }
-
-    public String getTitle() {
-        return mTitle;
-    }
-
-    public boolean isInActiveIconAvailable() {
-        return inActiveIconAvailable;
-    }
-
-    public int getActiveColor() {
-        return mActiveColor;
-    }
-
-    public NavigationItem setActiveColor(int mActiveColor) {
-        this.mActiveColor = mActiveColor;
+    public NavigationItem setSelectTextColor(int selectTextColor) {
+        this.selectTextColor = selectTextColor;
         return this;
     }
 }
