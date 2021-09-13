@@ -47,7 +47,8 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
     private View snackBar;
     private boolean mIsHidden;
     private ViewPropertyAnimatorCompat mTranslationAnimator;
-    private Listener showHideListener;
+    private ViewPropertyAnimatorListener showViewPropertyAnimatorListener;
+    private ViewPropertyAnimatorListener hideViewPropertyAnimatorListener;
 
     protected static final int ENTER_ANIMATION_DURATION = 225;
 
@@ -214,24 +215,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
      */
     public void show(View view, boolean animate) {
         mIsHidden = false;
-        setTranslationY(view, 0, animate, new ViewPropertyAnimatorListener() {
-            @Override
-            public void onAnimationStart(View view) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(View view) {
-                if (showHideListener != null) {
-                    showHideListener.onShow(view);
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(View view) {
-
-            }
-        });
+        setTranslationY(view, 0, animate, showViewPropertyAnimatorListener);
     }
 
     /**
@@ -246,24 +230,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
      */
     public void hide(View view, boolean animate) {
         mIsHidden = true;
-        setTranslationY(view, view.getHeight(), animate, new ViewPropertyAnimatorListener() {
-            @Override
-            public void onAnimationStart(View view) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(View view) {
-                if (showHideListener != null) {
-                    showHideListener.onHide(view);
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(View view) {
-
-            }
-        });
+        setTranslationY(view, view.getHeight(), animate, hideViewPropertyAnimatorListener);
     }
 
     /**
@@ -319,8 +286,12 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
         mTranslationAnimator.translationY(offset).start();
     }
 
-    public void setShowHideListener(Listener showHideListener) {
-        this.showHideListener = showHideListener;
+    public void setShowViewPropertyAnimatorListener(ViewPropertyAnimatorListener showViewPropertyAnimatorListener) {
+        this.showViewPropertyAnimatorListener = showViewPropertyAnimatorListener;
+    }
+
+    public void setHideViewPropertyAnimatorListener(ViewPropertyAnimatorListener hideViewPropertyAnimatorListener) {
+        this.hideViewPropertyAnimatorListener = hideViewPropertyAnimatorListener;
     }
 
     public static interface Listener {
