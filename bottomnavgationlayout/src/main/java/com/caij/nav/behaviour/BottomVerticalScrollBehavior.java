@@ -11,6 +11,7 @@ import androidx.core.os.ParcelableCompat;
 import androidx.core.os.ParcelableCompatCreatorCallbacks;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewPropertyAnimatorCompat;
+import androidx.core.view.ViewPropertyAnimatorListener;
 import androidx.core.view.ViewPropertyAnimatorUpdateListener;
 import androidx.customview.view.AbsSavedState;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
@@ -18,10 +19,12 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Interpolator;
 
 
 import com.caij.nav.BottomNavigationLayout;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
@@ -44,6 +47,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
     private View snackBar;
     private boolean mIsHidden;
     private ViewPropertyAnimatorCompat mTranslationAnimator;
+    private Listener showHideListener;
 
     protected static final int ENTER_ANIMATION_DURATION = 225;
 
@@ -210,7 +214,24 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
      */
     public void show(View view, boolean animate) {
         mIsHidden = false;
-        setTranslationY(view, 0, animate);
+        setTranslationY(view, 0, animate, new ViewPropertyAnimatorListener() {
+            @Override
+            public void onAnimationStart(View view) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(View view) {
+                if (showHideListener != null) {
+                    showHideListener.onShow(view);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(View view) {
+
+            }
+        });
     }
 
     /**
@@ -225,21 +246,44 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
      */
     public void hide(View view, boolean animate) {
         mIsHidden = true;
-        setTranslationY(view, view.getHeight(), animate);
+        setTranslationY(view, view.getHeight(), animate, new ViewPropertyAnimatorListener() {
+            @Override
+            public void onAnimationStart(View view) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(View view) {
+                if (showHideListener != null) {
+                    showHideListener.onHide(view);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(View view) {
+
+            }
+        });
     }
 
     /**
      * @param offset  offset needs to be set
      * @param animate is animation enabled for translation
      */
-    private void setTranslationY(View view, int offset, boolean animate) {
+    private void setTranslationY(View view, int offset, boolean animate, ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
         if (animate) {
-            animateOffset(view, offset);
+            animateOffset(view, offset, viewPropertyAnimatorListener);
         } else {
             if (mTranslationAnimator != null) {
                 mTranslationAnimator.cancel();
             }
+            if (viewPropertyAnimatorListener != null) {
+                viewPropertyAnimatorListener.onAnimationStart(view);
+            }
             view.setTranslationY(offset);
+            if (viewPropertyAnimatorListener != null) {
+                viewPropertyAnimatorListener.onAnimationEnd(view);
+            }
         }
     }
 
@@ -252,7 +296,7 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
      *
      * @param offset translation offset that needs to set with animation
      */
-    private void animateOffset(View view, final int offset) {
+    private void animateOffset(View view, final int offset, ViewPropertyAnimatorListener viewPropertyAnimatorListener) {
         if (mTranslationAnimator == null) {
             mTranslationAnimator = ViewCompat.animate(view);
             mTranslationAnimator.setDuration(ENTER_ANIMATION_DURATION);
@@ -268,7 +312,20 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
             }
         });
 
+        if (viewPropertyAnimatorListener != null) {
+            mTranslationAnimator.setListener(viewPropertyAnimatorListener);
+        }
+
         mTranslationAnimator.translationY(offset).start();
+    }
+
+    public void setShowHideListener(Listener showHideListener) {
+        this.showHideListener = showHideListener;
+    }
+
+    public static interface Listener {
+        void onShow(View view);
+        void onHide(View view);
     }
 
     protected static class SavedState extends AbsSavedState {
@@ -302,5 +359,18 @@ public class BottomVerticalScrollBehavior extends VerticalScrollingBehavior<Bott
                         return new SavedState[size];
                     }
                 });
+    }
+
+    public static BottomVerticalScrollBehavior from(@NonNull View view) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (!(params instanceof CoordinatorLayout.LayoutParams)) {
+            throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
+        }
+        CoordinatorLayout.Behavior<?> behavior =
+                ((CoordinatorLayout.LayoutParams) params).getBehavior();
+        if (!(behavior instanceof BottomVerticalScrollBehavior)) {
+            throw new IllegalArgumentException("The view is not associated with BottomSheetBehavior");
+        }
+        return (BottomVerticalScrollBehavior) behavior;
     }
 }
