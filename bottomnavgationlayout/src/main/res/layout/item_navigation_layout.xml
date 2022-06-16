@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/tab_item_layout_icon"
-        android:layout_width="@dimen/nav_item_icon_width"
-        android:layout_height="@dimen/nav_item_icon_width"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:scaleType="fitCenter"/>

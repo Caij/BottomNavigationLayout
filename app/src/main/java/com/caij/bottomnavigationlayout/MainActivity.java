@@ -22,9 +22,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final BottomNavigationLayout bottomNavigationLayout = (BottomNavigationLayout) findViewById(R.id.bottom_nav_layout);
         int color = fetchContextColor(this, R.attr.colorPrimary);
-        bottomNavigationLayout.addItem(new NavigationItem("首页", getResources().getDrawable(R.mipmap.icon_home)).setActiveColor(color))
-                .addItem(new NavigationItem("首页", getResources().getDrawable(R.mipmap.icon_message)).setActiveColor(color))
-                .addItem(new NavigationItem("首页", getResources().getDrawable(R.mipmap.icon_me)).setActiveColor(color))
+        bottomNavigationLayout.addItem(new NavigationItem("首页", getResources().getDrawable(R.mipmap.icon_home), color, color))
+                .addItem(new NavigationItem("首页", getResources().getDrawable(R.mipmap.icon_message), color, color))
+                .addItem(new NavigationItem("首页", getResources().getDrawable(R.mipmap.icon_me), color, color))
                 .initialise();
 
         TextView tvStatusBadge = bottomNavigationLayout.getTab(0).getTvBadge();

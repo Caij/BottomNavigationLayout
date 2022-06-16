@@ -3,7 +3,6 @@
 
     <declare-styleable name="BottomNavigationLayout">
         <attr name="tabItemTextSize" format="reference|dimension"/>
-        <attr name="tabItemImageSize" format="reference|dimension"/>
         <attr name="tabItemBadgeTextSize" format="reference|dimension"/>
         <attr name="tabItemBadgeColor" format="reference|color"/>
         <attr name="isShowText" format="boolean"/>
