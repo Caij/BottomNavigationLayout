@@ -8,7 +8,7 @@ Or use Gradle:
 
 ```gradle
 dependencies {
-    compile 'io.github.caij:BottomNavigationLayout:2.0.1'
+    compile 'io.github.caij:BottomNavigationLayout:2.1.0'
 }
 ```
 

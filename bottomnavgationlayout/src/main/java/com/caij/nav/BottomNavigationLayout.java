@@ -34,6 +34,7 @@ public class BottomNavigationLayout extends LinearLayout {
     private OnTabSelectedListener mTabSelectedListener;
 
     private int tabItemBadgeTextSize;
+    private int tabItemImageSize;
     private int tabItemTextSize;
     private int tabItemBadgeColor;
     private boolean isShowText;
@@ -64,6 +65,7 @@ public class BottomNavigationLayout extends LinearLayout {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.BottomNavigationLayout, defStyleAttr, defStyleRes);
 
         tabItemBadgeTextSize = typedArray.getDimensionPixelOffset(R.styleable.BottomNavigationLayout_tabItemBadgeTextSize, getResources().getDimensionPixelOffset(R.dimen.nav_item_badge_text_size));
+        tabItemImageSize = typedArray.getDimensionPixelOffset(R.styleable.BottomNavigationLayout_tabItemImageSize, ViewGroup.LayoutParams.WRAP_CONTENT);
         tabItemTextSize = typedArray.getDimensionPixelOffset(R.styleable.BottomNavigationLayout_tabItemTextSize, getResources().getDimensionPixelOffset(R.dimen.nav_item_label_text_size));
         tabItemBadgeColor = typedArray.getColor(R.styleable.BottomNavigationLayout_tabItemBadgeColor, getResources().getColor(R.color.default_badge_color));
         isShowText = typedArray.getBoolean(R.styleable.BottomNavigationLayout_isShowText, true);
@@ -83,6 +85,11 @@ public class BottomNavigationLayout extends LinearLayout {
 
             navigationItemView.getLabelTextView().setTextSize(TypedValue.COMPLEX_UNIT_PX, tabItemTextSize);
             navigationItemView.getTvBadge().setTextSize(TypedValue.COMPLEX_UNIT_PX, tabItemBadgeTextSize);
+
+            ViewGroup.LayoutParams layoutParams = navigationItemView.getIconImageView().getLayoutParams();
+            layoutParams.height = tabItemImageSize;
+            layoutParams.width = tabItemImageSize;
+            navigationItemView.getIconImageView().setLayoutParams(layoutParams);
 
             navigationItemView.getTvBadge().setBackgroundColor(tabItemBadgeColor);
 
