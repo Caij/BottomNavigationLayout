@@ -7,14 +7,8 @@ Download
 Or use Gradle:
 
 ```gradle
-repositories {
-    maven {
-        url "https://jitpack.io"
-    }
-}
-
 dependencies {
-    compile 'com.github.Caij:BottomNavigationLayout:1.7.2'
+    compile 'io.github.caij:BottomNavigationLayout:2.0.1'
 }
 ```
 
